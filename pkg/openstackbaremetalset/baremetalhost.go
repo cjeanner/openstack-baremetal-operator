@@ -70,7 +70,11 @@ func BaremetalHostProvision(
 	// User data cloud-init secret
 	if userDataSecret == nil {
 		templateParameters := make(map[string]interface{})
-		templateParameters["AuthorizedKeys"] = strings.TrimSuffix(string(sshSecret.Data["authorized_keys"]), "\n")
+		ssh_keys := make([]string)
+		for _, key := range string.split(strings.TrimSuffix(string(sshSecret.Data["authorized_keys"]), "\n")) {
+			ssh_keys = append(ssh_keys, key)
+		}
+		templateParameters["AuthorizedKeys"] = ssh_keys
 		templateParameters["HostName"] = bmhStatus.Hostname
 		//If Hostname is fqdn, use it
 		if !hostNameIsFQDN(bmhStatus.Hostname) && instance.Spec.DomainName != "" {
